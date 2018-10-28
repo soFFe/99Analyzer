@@ -1,7 +1,7 @@
-﻿<Application x:Class="_99Analyzer.App"
+﻿<Application x:Class="NinetyNineAnalyzer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:_99Analyzer"
+             xmlns:local="clr-namespace:NinetyNineAnalyzer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

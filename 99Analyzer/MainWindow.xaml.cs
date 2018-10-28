@@ -12,8 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using NinetyNineLibrary;
+using NinetyNineLibrary.Entities;
+using NinetyNineLibrary.EntityModels;
 
-namespace _99Analyzer
+namespace NinetyNineAnalyzer
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
@@ -23,6 +26,37 @@ namespace _99Analyzer
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private async void btnAnalyze_Click(object sender, RoutedEventArgs e)
+        {
+            btnAnalyze.IsEnabled = false;
+            ErrorHandling.Clear();
+
+            var tiSuccess = false;
+            var miSuccess = false;
+            try
+            {
+                var team = await TeamModel.GetInstanceAsync(txtURL.Text);
+                tiSuccess = team.ParseInfo();
+
+                // Get all MatchURLs of our team for the divisions they played
+                var divisonUrls = new List<string>();
+                foreach (var season in team.Seasons)
+                {
+                    var div = season.Value;
+                    divisonUrls.Add(div.Url);
+                }
+            }
+            catch(Exception x)
+            {
+                ErrorHandling.Log(x.Message);
+            }
+
+            if (!tiSuccess)
+                MessageBox.Show(ErrorHandling.JoinedString, AnalyzerConstants.WindowTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+
+            btnAnalyze.IsEnabled = true;
         }
     }
 }
