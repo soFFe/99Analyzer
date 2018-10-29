@@ -24,7 +24,7 @@ namespace NinetyNineLibrary.EntityModels
 
             using (var parser = new UriParser(TeamURL))
             {
-                var result = await parser.ParseSingle();
+                var result = await parser.ParseSingleAsync();
                 var doc = new HtmlDocument();
                 doc.LoadHtml(result);
 

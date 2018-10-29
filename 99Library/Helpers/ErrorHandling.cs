@@ -9,7 +9,7 @@ namespace NinetyNineLibrary
     public static class ErrorHandling
     {
         private static List<string> errors = new List<string>();
-        private static string joinedString = String.Empty;
+        private static string joinedString = string.Empty;
         private static bool hasErrors = false;
 
         public static string JoinedString { get => joinedString; private set => joinedString = value; }
@@ -29,7 +29,7 @@ namespace NinetyNineLibrary
 
         public static void Clear()
         {
-            joinedString = String.Empty;
+            joinedString = string.Empty;
             hasErrors = false;
             errors.Clear();
         }

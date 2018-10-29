@@ -33,6 +33,7 @@ namespace NinetyNineAnalyzer
             btnAnalyze.IsEnabled = false;
             ErrorHandling.Clear();
 
+            List<Match> matches;
             var tiSuccess = false;
             var miSuccess = false;
             try
@@ -41,19 +42,27 @@ namespace NinetyNineAnalyzer
                 tiSuccess = team.ParseInfo();
 
                 // Get all MatchURLs of our team for the divisions they played
-                var divisonUrls = new List<string>();
+                var matchUrls = new List<string>();
                 foreach (var season in team.Seasons)
                 {
                     var div = season.Value;
-                    divisonUrls.Add(div.Url);
+                    var parsedMatchUrls = await MatchModel.ParseMatchLinksAsync(div, team.Shortname);
+                    matchUrls.AddRange(parsedMatchUrls);
                 }
+
+                // Get Match infos
+                matches = await MatchModel.ParseMatchesAsync(matchUrls);
+                if(matches.Count == 0) 
+                    ErrorHandling.Error("No valid matches found");
+
+                miSuccess = true;
             }
             catch(Exception x)
             {
-                ErrorHandling.Log(x.Message);
+                ErrorHandling.Error(x.Message);
             }
 
-            if (!tiSuccess)
+            if (!tiSuccess || !miSuccess)
                 MessageBox.Show(ErrorHandling.JoinedString, AnalyzerConstants.WindowTitle, MessageBoxButton.OK, MessageBoxImage.Error);
 
             btnAnalyze.IsEnabled = true;
