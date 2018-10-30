@@ -46,6 +46,9 @@
   <ItemGroup>
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Match.cs" />
+    <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Repositories\Map.cs" />
+    <Compile Include="Repositories\Vote.cs" />
     <Compile Include="EntityModels\MatchModel.cs" />
     <Compile Include="EntityModels\TeamModel.cs" />
     <Compile Include="Helpers\AnalyzerConstants.cs" />
