@@ -56,6 +56,34 @@ namespace NinetyNineLibrary.Entities
 
             status = AnalyzerConstants.MatchStatus.Played;
 
+            // get round score per map
+            var nodeFirstMapScore = node.SelectSingleNode("//div[@id='content']/text()[preceding-sibling::br]");
+            var firstMapScoreStr = nodeFirstMapScore.InnerText.Trim().Split(':');
+            if(firstMapScoreStr.Count() != 3)
+            {
+                ErrorHandling.Log($"Unexpected Error: Could not find map score for match { url }");
+                return false;
+            }
+
+            // first map
+            var firstMapScores = new Dictionary<AnalyzerConstants.TeamSide, int>();
+            var firstMapName = firstMapScoreStr[0];
+            var firstMapScoreA = Convert.ToInt32(firstMapScoreStr[1].Trim());
+            var firstMapScoreB = Convert.ToInt32(firstMapScoreStr[2].Trim());
+            firstMapScores.Add(AnalyzerConstants.TeamSide.A, firstMapScoreA);
+            firstMapScores.Add(AnalyzerConstants.TeamSide.B, firstMapScoreB);
+            maps.Add(new Map(firstMapName, firstMapScores));
+
+            // second map
+            var secondMapScores = new Dictionary<AnalyzerConstants.TeamSide, int>();
+            var secondMapScoreStr = nodeFirstMapScore.NextSibling.NextSibling.InnerText.Trim().Split(':');
+            var secondMapName = secondMapScoreStr[0];
+            var secondMapScoreA = Convert.ToInt32(secondMapScoreStr[1].Trim());
+            var secondMapScoreB = Convert.ToInt32(secondMapScoreStr[2].Trim());
+            secondMapScores.Add(AnalyzerConstants.TeamSide.A, secondMapScoreA);
+            secondMapScores.Add(AnalyzerConstants.TeamSide.B, secondMapScoreB);
+            maps.Add(new Map(secondMapName, secondMapScores));
+
             // get vote data from match log
             var logNode = node.SelectSingleNode("//table[@id='match_log']");
             var trNodes = logNode.SelectNodes("tr");
@@ -72,6 +100,7 @@ namespace NinetyNineLibrary.Entities
                 var aktion = cols[2].InnerText; // 3rd column: "Aktion"
                 if (aktion != "mapvote_ended")
                     continue;
+
                 
                 var voteData = cols[3].InnerText.Split(',');
                 foreach(var sVote in voteData)
@@ -114,7 +143,7 @@ namespace NinetyNineLibrary.Entities
 
                     var map = new Map(reMap);
                     if (type == AnalyzerConstants.VoteType.Pick)
-                        maps.Add(map);
+                        map = maps.Where(m => m.Name == map.Name).First();
 
                     // create vote instance
                     var vote = new Vote(side, type, map);
@@ -129,34 +158,6 @@ namespace NinetyNineLibrary.Entities
                 ErrorHandling.Log($"Could not find vote data for presumably played match { url }. This may happen if the match has no match log entries anymore.");
                 return false;
             }
-
-            // get round score per map
-            var nodeFirstMapScore = node.SelectSingleNode("//div[@id='content']/text()[preceding-sibling::br]");
-            var firstMapScoreStr = nodeFirstMapScore.InnerText.Trim().Split(':');
-            if(firstMapScoreStr.Count() != 3)
-            {
-                ErrorHandling.Log($"Unexpected Error: Could not find map score for match { url }");
-                return false;
-            }
-
-            // first map
-            var firstMapScores = new Dictionary<AnalyzerConstants.TeamSide, int>();
-            var firstMapName = firstMapScoreStr[0];
-            var firstMapScoreA = Convert.ToInt32(firstMapScoreStr[1].Trim());
-            var firstMapScoreB = Convert.ToInt32(firstMapScoreStr[2].Trim());
-            firstMapScores.Add(AnalyzerConstants.TeamSide.A, firstMapScoreA);
-            firstMapScores.Add(AnalyzerConstants.TeamSide.B, firstMapScoreB);
-            maps.Where(map => map.Name == firstMapName).First().Score = firstMapScores;
-
-            // second map
-            var secondMapScores = new Dictionary<AnalyzerConstants.TeamSide, int>();
-            var secondMapScoreStr = nodeFirstMapScore.NextSibling.NextSibling.InnerText.Trim().Split(':');
-            var secondMapName = secondMapScoreStr[0];
-            var secondMapScoreA = Convert.ToInt32(secondMapScoreStr[1].Trim());
-            var secondMapScoreB = Convert.ToInt32(secondMapScoreStr[2].Trim());
-            secondMapScores.Add(AnalyzerConstants.TeamSide.A, secondMapScoreA);
-            secondMapScores.Add(AnalyzerConstants.TeamSide.B, secondMapScoreB);
-            maps.Where(map => map.Name == secondMapName).First().Score = secondMapScores;
 
             return true;
         }

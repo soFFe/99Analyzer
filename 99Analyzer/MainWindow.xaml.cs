@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using NinetyNineLibrary;
 using NinetyNineLibrary.Entities;
 using NinetyNineLibrary.EntityModels;
+using NinetyNineLibrary.Helpers;
 
 namespace NinetyNineAnalyzer
 {
@@ -26,6 +27,7 @@ namespace NinetyNineAnalyzer
         public MainWindow()
         {
             InitializeComponent();
+            ErrorHandling.Log("--- Started 99Analyzer ---");
         }
 
         private async void btnAnalyze_Click(object sender, RoutedEventArgs e)
@@ -33,12 +35,13 @@ namespace NinetyNineAnalyzer
             btnAnalyze.IsEnabled = false;
             ErrorHandling.Clear();
 
-            List<Match> matches;
+            List<Match> matches = null;
+            Team team = null;
             var tiSuccess = false;
             var miSuccess = false;
             try
             {
-                var team = await TeamModel.GetInstanceAsync(txtURL.Text);
+                team = await TeamModel.GetInstanceAsync(txtURL.Text);
                 tiSuccess = team.ParseInfo();
 
                 // Get all MatchURLs of our team for the divisions they played
@@ -52,8 +55,11 @@ namespace NinetyNineAnalyzer
 
                 // Get Match infos
                 matches = await MatchModel.ParseMatchesAsync(matchUrls);
-                if(matches.Count == 0) 
+                if (matches.Count == 0)
+                {
                     ErrorHandling.Error("No valid matches found");
+                    miSuccess = false;
+                }
 
                 miSuccess = true;
             }
@@ -64,6 +70,14 @@ namespace NinetyNineAnalyzer
 
             if (!tiSuccess || !miSuccess)
                 MessageBox.Show(ErrorHandling.JoinedString, AnalyzerConstants.WindowTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                // output
+                // todo: open new window to choose output method
+
+                // todo: HTML output to file
+                HtmlOutput.CreateFile(team, matches, team.Name + ".html");
+            }
 
             btnAnalyze.IsEnabled = true;
         }

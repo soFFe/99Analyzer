@@ -20,19 +20,15 @@ namespace NinetyNineLibrary.EntityModels
             if (!match.Success)
                 ErrorHandling.Error("The URL provided is not a Team URL");
 
-            Team team;
+            var parser = new UriParser(TeamURL);
+            var result = await parser.ParseSingleAsync();
+            var doc = new HtmlDocument();
+            doc.LoadHtml(result);
 
-            using (var parser = new UriParser(TeamURL))
+            var team = new Team(doc.DocumentNode)
             {
-                var result = await parser.ParseSingleAsync();
-                var doc = new HtmlDocument();
-                doc.LoadHtml(result);
-
-                team = new Team(doc.DocumentNode)
-                {
-                    Url = TeamURL
-                };
-            }
+                Url = TeamURL
+            };
 
             return team;
         }

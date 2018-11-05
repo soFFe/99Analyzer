@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Match.cs" />
+    <Compile Include="Helpers\HtmlOutput.cs" />
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\Map.cs" />
     <Compile Include="Repositories\Vote.cs" />
@@ -62,5 +63,14 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\HtmlTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

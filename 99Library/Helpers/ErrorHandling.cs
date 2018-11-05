@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,13 @@ namespace NinetyNineLibrary
 
         public static void Log(string strError)
         {
-            // todo
+            Directory.CreateDirectory("log");
+
+            using (var sw = File.AppendText("log/99Analyzer.log"))
+            {
+                var dt = DateTime.Now;
+                sw.WriteLine("[" + dt.ToString("u") + "] " + strError);
+            }
         }
     }
 }

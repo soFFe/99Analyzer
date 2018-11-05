@@ -13,61 +13,59 @@ namespace NinetyNineLibrary.EntityModels
         public static async Task<List<string>> ParseMatchLinksAsync(Division div, string teamShortName)
         {
             var matchUrls = new List<string>();
+            var parser = new UriParser(div.Url);
 
-            using (var parser = new UriParser(div.Url))
+            var result = await parser.ParseSingleAsync();
+            var doc = new HtmlDocument();
+            doc.LoadHtml(result);
+
+            try
             {
-                var result = await parser.ParseSingleAsync();
-                var doc = new HtmlDocument();
-                doc.LoadHtml(result);
+                var tblMatches = doc.DocumentNode.SelectSingleNode("//table[@class='league_table_matches']");
+                var trMatches = tblMatches.Elements("tr");
 
-                try
+                foreach (var tr in trMatches)
                 {
-                    var tblMatches = doc.DocumentNode.SelectSingleNode("//table[@class='league_table_matches']");
-                    var trMatches = tblMatches.Elements("tr");
+                    // skip "Spieltag X" and empty cells
+                    if (tr.Elements("th").Count() > 0)
+                        continue;
 
-                    foreach (var tr in trMatches)
+                    var matchUrl = tr.SelectSingleNode("td/a").GetAttributeValue("href", "");
+                    if (string.IsNullOrEmpty(matchUrl))
+                        throw new Exception("Could not fetch MatchUrl");
+
+                    var teamFound = false;
+
+                    var teamColumns = tr.SelectNodes("td/a");
+
+                    // get 2nd and 3rd column anchors
+                    for (var i = 1; i <= 2 && !teamFound; i++)
                     {
-                        // skip "Spieltag X" and empty cells
-                        if (tr.Elements("th").Count() > 0)
-                            continue;
-
-                        var matchUrl = tr.SelectSingleNode("td/a").GetAttributeValue("href", "");
-                        if (string.IsNullOrEmpty(matchUrl))
-                            throw new Exception("Could not fetch MatchUrl");
-
-                        var teamFound = false;
-
-                        var teamColumns = tr.SelectNodes("td/a");
-
-                        // get 2nd and 3rd column anchors
-                        for (var i = 1; i <= 2 && !teamFound; i++)
+                        var col = teamColumns[i];
+                        var shortName = col.InnerText.Trim();
+                        if (i == 2)
                         {
-                            var col = teamColumns[i];
-                            var shortName = col.InnerText.Trim();
-                            if (i == 2)
+                            var regExName = System.Text.RegularExpressions.Regex.Match(col.InnerText, AnalyzerConstants.DivisonOverviewThirdColumnTeamNamePattern); // very long
+                            if (!regExName.Success)
                             {
-                                var regExName = System.Text.RegularExpressions.Regex.Match(col.InnerText, AnalyzerConstants.DivisonOverviewThirdColumnTeamNamePattern); // very long
-                                if (!regExName.Success)
-                                {
-                                    ErrorHandling.Log($"RegEx for getting the second team's name failed. MatchUrl: \"{ matchUrl }\"");
-                                    break;
-                                }
-
-                                shortName = regExName.Groups[1].Value;
+                                ErrorHandling.Log($"RegEx for getting the second team's name failed. MatchUrl: \"{ matchUrl }\"");
+                                break;
                             }
-                            if (shortName == teamShortName)
-                                teamFound = true;
-                        }
 
-                        if (teamFound)
-                            matchUrls.Add(matchUrl);
+                            shortName = regExName.Groups[1].Value;
+                        }
+                        if (shortName == teamShortName)
+                            teamFound = true;
                     }
+
+                    if (teamFound)
+                        matchUrls.Add(matchUrl);
                 }
-                catch (Exception x)
-                {
-                    ErrorHandling.Error($"Could not parse Matchlinks for Divison \"{ div.Name }\"");
-                    ErrorHandling.Log($"Exception Message: { x.Message }");
-                }
+            }
+            catch (Exception x)
+            {
+                ErrorHandling.Error($"Could not parse Matchlinks for Divison \"{ div.Name }\"");
+                ErrorHandling.Log($"Exception Message: { x.Message }");
             }
 
             return matchUrls;
@@ -76,31 +74,29 @@ namespace NinetyNineLibrary.EntityModels
         public static async Task<List<Match>> ParseMatchesAsync(ICollection<string> matchUrls)
         {
             var matches = new List<Match>();
+            var parser = new UriParser(matchUrls);
 
-            using (var parser = new UriParser(matchUrls))
+            var result = await parser.ParseAllAsync();
+
+            foreach (var request in result)
             {
-                var result = await parser.ParseAllAsync();
+                var doc = new HtmlDocument();
+                doc.LoadHtml(request.Value);
 
-                foreach (var request in result)
+                try
                 {
-                    var doc = new HtmlDocument();
-                    doc.LoadHtml(request.Value);
-
-                    try
+                    var match = new Match(doc.DocumentNode)
                     {
-                        var match = new Match(doc.DocumentNode)
-                        {
-                            Url = request.Key
-                        };
-                        var success = match.ParseInfo();
+                        Url = request.Key
+                    };
+                    var success = match.ParseInfo();
 
-                        if (success)
-                            matches.Add(match);
-                    }
-                    catch(Exception x)
-                    {
-                        ErrorHandling.Log($"Match could not be parsed. Exception: { x.Message }");
-                    }
+                    if (success)
+                        matches.Add(match);
+                }
+                catch(Exception x)
+                {
+                    ErrorHandling.Log($"Match { request.Key } could not be parsed. Exception: { x.Message }");
                 }
             }
 

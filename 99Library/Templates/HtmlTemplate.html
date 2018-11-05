@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<head>
+    <title>/*:title:*/</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+    <!-- popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap4 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <!-- chartjs -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-4">
+                <div class="card">
+                    <div class="card-header">Bans</div>
+                    <div class="card-body">
+                        <canvas id="bans-chart" width="500" height="500"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card">
+                    <div class="card-header">Picks</div>
+                    <div class="card-body">
+                        <canvas id="picks-chart" width="500" height="500"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card">
+                    <div class="card-header">Disregarded</div>
+                    <div class="card-body">
+                        <canvas id="disregarded-chart" width="500" height="500"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script>
+        new Chart(document.getElementById("bans-chart"), {
+            type: 'pie',
+            data: {
+                labels: ["/*:bans.labels:*/"],
+                datasets: [{
+                    backgroundColor: ["#007bff", "#28a745", "#dc3545", "#ffc107", "#9C27B0", "#FF9800", "#17a2b8"],
+                    data: [/*:bans.dataset:*/]
+                }]
+            }
+        });
+        new Chart(document.getElementById("picks-chart"), {
+            type: 'pie',
+            data: {
+                labels: ["/*:picks.labels:*/"],
+                datasets: [{
+                    backgroundColor: ["#007bff", "#28a745", "#dc3545", "#ffc107", "#9C27B0", "#FF9800", "#17a2b8"],
+                    data: [/*:picks.dataset:*/]
+                }]
+            }
+        });
+        new Chart(document.getElementById("disregarded-chart"), {
+            type: 'pie',
+            data: {
+                labels: ["/*:disregarded.labels:*/"],
+                datasets: [{
+                    backgroundColor: ["#007bff", "#28a745", "#dc3545", "#ffc107", "#9C27B0", "#FF9800", "#17a2b8"],
+                    data: [/*:disregarded.dataset:*/]
+                }]
+            }
+        });
+    </script>
+</body>

@@ -7,7 +7,7 @@ using System.Net;
 
 namespace NinetyNineLibrary
 {
-    public class UriParser : IDisposable
+    public class UriParser
     {
         private List<string> urls;
 
@@ -71,11 +71,6 @@ namespace NinetyNineLibrary
             var ret = urls.Select((k, i) => new { k, v = results[i] }).ToDictionary(x => x.k, x => x.v);
 
             return ret;
-        }
-
-        public void Dispose()
-        {
-            // Leave this to the garbage collector
         }
     }
 }
