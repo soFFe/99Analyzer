@@ -1,6 +1,6 @@
 # 99Analyzer
-## Team Analyzer for [99Damage.de](https://csgo.99damage.de/)
-## Written in C# using .NET Core v2.2
+### Team Analyzer for [99Damage.de](https://csgo.99damage.de/)
+###### Written in C# using .NET Core v2.2
 
 This project's goal is to provide an effective way to analyze your opponent.
 The user should be able to interpret the data themselves as well, though.
@@ -19,7 +19,7 @@ Provide Error Messages and/or pictures of the problem, if you can.
 Fork the repository, make your changes and create a Pull Request.
 Please include some sort of general concept / information about what you have changed / added **and why**.
 
-## Thanks to
+### Special thanks to
 
 * [Selected eSports](https://selected-esports.de/)
 * [subnet](https://github.com/subnet-)
