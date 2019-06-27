@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <RootNamespace>NinetyNineAnalyzer_WebApp</RootNamespace>
+    <RepositoryUrl>https://github.com/soFFe/99Analyzer</RepositoryUrl>
+    <Authors>soFFe</Authors>
+    <Company />
+    <Product>99Analyzer</Product>
+    <PackageId>99Analyzer</PackageId>
+    <UserSecretsId>25110198-723a-4998-b9e6-e12a7716c387</UserSecretsId>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\99LibraryCore\99LibraryCore.csproj" />
+  </ItemGroup>
+
+</Project>

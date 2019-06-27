@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@NinetyNineLibrary.AnalyzerConstants.WindowTitle</title>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/popper.js/popper.min.js"></script>
+    <script src="~/lib/twitter-bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/lib/feather-icons/feather.min.js"></script>
+    <link rel="stylesheet" href="~/lib/twitter-bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <span class="navbar-brand d-table">
+                    <a class="d-table-cell" asp-area="" asp-page="/Index"><img src="~/img/analyzer-logo-lupe.png" style="width: 40px;" /></a>
+                    <span class="d-table-cell align-middle pl-4">Team Analyzer for <a target="_blank" href="https://csgo.99damage.de/">99Damage.de</a></span>
+                </span>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container h-100">
+            <div class="d-table h-100 w-100">
+                <div class="d-table-cell align-middle">
+                    <img src="~/img/analyzer-logo.png" style="height: 40px;" />
+                </div>
+                <div class="d-table-cell align-middle text-right">
+                    <a target="_blank" href="https://github.com/soFFe/99Analyzer" class="text-dark"><span data-feather="github"></span></a>
+                    <a target="_blank" href="https://tunichtgut.org/" class="text-dark ml-2">@await Html.PartialAsync("../Partials/lemurhead")</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="errors-container" class="col-sm-12 col-md-8 offset-md-2"></div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
