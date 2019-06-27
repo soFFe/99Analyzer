@@ -1,0 +1,153 @@
+﻿@page
+@model IndexModel
+
+<form method="post" id="frmAnalyze" class="mb-4 sticky-top">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Team URL</span>
+        </div>
+        <input type="text" asp-for="Input.TeamUrl" class="form-control h-auto" id="teamUrl" required placeholder="https://csgo.99damage.de/de/leagues/teams/72906-selected-esports" value="https://csgo.99damage.de/de/leagues/teams/72906-selected-esports" />
+        <div class="input-group-append bg-white">
+            <button type="reset" class="btn btn-outline-secondary"><span data-feather="delete"></span></button>
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </div>
+    </div>
+</form>
+
+<nav class="fade">
+    <div class="nav nav-tabs" role="tablist" id="team-tabs">
+        <!-- tabs get generated here -->
+    </div>
+</nav>
+<div class="tab-content jumbotron rounded-0 fade" id="team-tabpanes">
+    <div class="tab-pane" id="team" role="tabpanel">
+        <nav class="navbar bg-light">
+            <div class="nav nav-pills nav-fill w-100" role="tablist" id="info-tabs">
+                <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#mapstats">Map Stats</a>
+                <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#matchstats">Match Stats</a>
+            </div>
+        </nav>
+        <div class="tab-pane card-columns" id="mapstats" role="tabpanel">
+            <!-- Bans -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Bans</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-bans">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-bans">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="bans-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Picks -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Picks</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-picks">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-picks">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="picks-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disregarded Maps -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Disregarded Maps</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-disregarded">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-disregarded">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="disregarded-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- panes get generated here -->
+</div>
+
+@section Scripts {
+    <script src="~/lib/Chart.js/Chart.min.js"></script>
+    <script src="~/lib/linq/linq.min.js"></script>
+    <script src="~/js/index.js"></script>
+    <script type="text/javascript">
+        var _MapPool = @Html.Raw(Json.Serialize(NinetyNineLibrary.AnalyzerConstants.MapPool));
+
+        $(function () {
+            $('#frmAnalyze').validate();
+            $('#teamUrl').rules("add", { teamurlRegex: "@Html.Raw(NinetyNineLibrary.AnalyzerConstants.TeamUrlPattern)" });
+
+            $('#frmAnalyze').on('submit', function (e) {
+                e.preventDefault();
+                let $this = $(this);
+
+                if (!$this.valid())
+                    return false;
+
+                $this.find('input').prop('readonly', true);
+                $this.find('button').prop('disabled', true);
+
+                $.ajax({
+                    method: "POST",
+                    timeout: 60000,
+                    data: $this.serialize()
+                })
+                    .done(function (data) {
+                        if (!data.success) {
+                            let errorHtml = data.errors.replace(/\n/g, "<br>");
+                            showError(errorHtml);
+                        }
+                        else {
+                            let cIndex = addToCache(data);
+                            let tabAdded = addTab(cIndex);
+                            bindCollapseEvents();
+                            interpretData(cIndex);
+                            createCharts(cIndex);
+                            $('.collapse').collapse('show');
+                        }
+                    })
+                    .fail(function (jqXHR, status, error) {
+                        showError("<strong>Request error #" + jqXHR.status + "</strong>: " + status + "<br>" + error);
+                    })
+                    .always(function () {
+                        $this.find('input').prop('readonly', false);
+                        $this.find('button').prop('disabled', false);
+                    });
+
+                return false;
+            });
+        });
+    </script>
+}
