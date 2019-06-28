@@ -11,6 +11,7 @@
     <PackageId>99Analyzer</PackageId>
     <UserSecretsId>25110198-723a-4998-b9e6-e12a7716c387</UserSecretsId>
     <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+    <StartupObject>NinetyNineAnalyzer_WebApp.Program</StartupObject>
   </PropertyGroup>
 
 
