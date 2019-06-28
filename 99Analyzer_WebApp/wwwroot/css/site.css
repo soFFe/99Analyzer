@@ -27,8 +27,6 @@ body {
 }
 
 #errors-container {
-    position: absolute;
-    bottom: 0;
     /* Margin bottom by footer height */
     margin-bottom: 60px;
 }

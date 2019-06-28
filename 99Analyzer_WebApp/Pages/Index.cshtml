@@ -23,7 +23,7 @@
     <div class="tab-pane" id="team" role="tabpanel">
         <nav class="navbar bg-light mb-3">
             <div class="nav nav-pills nav-fill w-100" role="tablist" id="info-tabs">
-                <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#mapstats">Map Stats</a>
+                <a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#mapstats">Map Stats</a>
                 <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#matchstats">Match Stats</a>
             </div>
         </nav>
@@ -72,12 +72,12 @@
                 </div>
             </div>
 
-            <!-- Disregarded Maps -->
+            <!-- Disregarded -->
             <div class="card">
                 <div class="card-header">
                     <div class="d-table w-100">
                         <div class="d-table-cell align-middle">
-                            <h3>Disregarded Maps</h3>
+                            <h3>Disregarded</h3>
                         </div>
                         <div class="d-table-cell text-right">
                             <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-disregarded">
@@ -93,6 +93,120 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Played -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Played</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-played">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-played">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="played-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Maps Won -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Maps Won</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-maps-won">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-maps-won">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="maps-won-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maps Lost -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Maps Lost</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-maps-lost">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-maps-lost">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="maps-lost-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rounds Won -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Rounds Won</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-rounds-won">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-rounds-won">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="rounds-won-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Rounds Lost -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-table w-100">
+                        <div class="d-table-cell align-middle">
+                            <h3>Rounds Lost</h3>
+                        </div>
+                        <div class="d-table-cell text-right">
+                            <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-rounds-lost">
+                                <span data-feather="minimize-2"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative collapse" id="card-rounds-lost">
+                    <div class="canvas-responsive-workaround"></div>
+                    <div class="canvas-container">
+                        <canvas id="rounds-lost-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="matchstats" class="tab-pane" role="tabpanel">
+
         </div>
     </div>
     <!-- panes get generated here -->
@@ -100,7 +214,6 @@
 
 @section Scripts {
     <script src="~/lib/Chart.js/Chart.min.js"></script>
-    <script src="~/lib/linq/linq.min.js"></script>
     <script src="~/js/index.js"></script>
     <script type="text/javascript">
         var _MapPool = @Html.Raw(Json.Serialize(NinetyNineLibrary.AnalyzerConstants.MapPool));
