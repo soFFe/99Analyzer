@@ -16,7 +16,7 @@ var chartData = {
     disregarded: []
 };
 var charts = {};
-        
+
 /**
  * Add a new tab if necessary and select it
  */
