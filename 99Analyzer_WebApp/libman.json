@@ -26,6 +26,11 @@
     {
       "library": "Chart.js@2.8.0",
       "destination": "wwwroot/lib/Chart.js/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "bootstrap-select@1.13.10",
+      "destination": "wwwroot/lib/bootstrap-select/"
     }
   ]
 }
