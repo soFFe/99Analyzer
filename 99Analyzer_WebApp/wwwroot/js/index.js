@@ -10,7 +10,10 @@ $.validator.addMethod(
 
 // Cached Data for teams that are displayed
 var rawData = [];
-var filterData = [];
+var filter = {
+    season: [],
+}
+var filteredData = [];
 var chartData = {
     bans: [],
     picks: [],
