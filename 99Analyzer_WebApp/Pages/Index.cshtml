@@ -14,19 +14,22 @@
     </div>
 </form>
 
+<!-- Team Navigation -->
 <nav class="fade">
     <div class="nav nav-tabs" role="tablist" id="team-tabs">
-        <!-- tabs get generated here -->
+        <!-- Team Tabs will be inserted here -->
     </div>
 </nav>
 <div class="tab-content jumbotron rounded-0 fade" id="team-tabpanes">
     <div class="tab-pane" id="team" role="tabpanel">
-        <div class="row bg-light p-3">
-            <p>Seasons</p>
-            <select id="filter-seasons">
-
+        <!-- Filters -->
+        <div class="bg-light p-3 rounded-top border-bottom d-md-table d-sm-block">
+            <label for="filter-seasons" class="d-md-table-cell d-sm-block p-2 font-weight-bold">Seasons</label>
+            <select id="filter-seasons" class="d-md-table-cell d-sm-block w-100" data-style="btn-outline-secondary" multiple>
+                <!-- Options will be inserted here -->
             </select>
         </div>
+        <!-- Stats Navigation -->
         <nav class="navbar bg-light mb-3">
             <div class="nav nav-pills nav-fill w-100" role="tablist" id="info-tabs">
                 <a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#mapstats">Map Stats</a>
@@ -171,7 +174,7 @@
                 <div class="card-header">
                     <div class="d-table w-100">
                         <div class="d-table-cell align-middle">
-                            <h3>Rounds Won</h3>
+                            <h3>&#8960; Rounds Won</h3>
                         </div>
                         <div class="d-table-cell text-right">
                             <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-rounds-won">
@@ -188,13 +191,12 @@
                 </div>
             </div>
 
-            
             <!-- Rounds Lost -->
             <div class="card">
                 <div class="card-header">
                     <div class="d-table w-100">
                         <div class="d-table-cell align-middle">
-                            <h3>Rounds Lost</h3>
+                            <h3>&#8960; Rounds Lost</h3>
                         </div>
                         <div class="d-table-cell text-right">
                             <button type="button" class="btn btn-outline-secondary collapse-toggle" data-toggle="collapse" data-target="#card-rounds-lost">
@@ -250,10 +252,19 @@
                         }
                         else {
                             let cIndex = addToCache(data);
-                            let tabAdded = addTab(cIndex);
+
+                            // tabs
+                            addTab(cIndex);
                             bindCollapseEvents();
+
+                            // filters
+                            createFilters(cIndex);
+                            applyFilters();
+
+                            // data
                             interpretData(cIndex);
                             createCharts(cIndex);
+
                             $('.collapse').collapse('show');
                         }
                     })

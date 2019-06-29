@@ -10,10 +10,14 @@ $.validator.addMethod(
 
 // Cached Data for teams that are displayed
 var rawData = [];
+var activeIndex = -1;
+
 var filter = {
-    season: [],
+    seasons: [],
+    status: [2],
 }
 var filteredData = [];
+
 var chartData = {
     bans: [],
     picks: [],
@@ -61,6 +65,7 @@ function addTab(cacheIndex) {
         $teamTabPanes.addClass("show");
     }
 
+    activeIndex = cacheIndex;
     $elTab.tab('show');
 }
 
@@ -101,7 +106,7 @@ function interpretData(cacheIndex) {
     if (cacheIndex == -1)
         cacheIndex = rawData.length - 1;
 
-    let data = rawData[cacheIndex],
+    let data = filteredData[cacheIndex],
         bans = [], picks = [],
         enemyBans = [], enemyPicks = [],
         disregarded = [], played = [],
@@ -109,7 +114,7 @@ function interpretData(cacheIndex) {
         roundsWon = {}, roundsLost = {};
 
     // we're tracking all vote data we have - ignoring if the match was actually played or not
-    $.each(data.matches.filter(m => m.votes.length > 0), function (i, match) {
+    $.each(data.matches.filter(m => m.votes.length > 0 && filter.status.indexOf(m.status) !== -1), function (i, match) {
         // our teamnumber - not making sure if we're even in the names object.
         // trusts the backend's data integrity..
         let teamNumber = match.teamNames.A == data.team.name ? 0 : 1;
@@ -146,7 +151,7 @@ function interpretData(cacheIndex) {
         for (var map of match.maps) {
             let mapScore = Object.values(map.score);
 
-            // maps won/lost
+            // maps won / lost
             if (mapScore[teamNumber] > mapScore[enemyTeamNumber])
                 mapsWon.push(map.name);
             else
@@ -156,30 +161,35 @@ function interpretData(cacheIndex) {
             if (Object.keys(roundsWon).indexOf(map.name) === -1)
                 roundsWon[map.name] = mapScore[teamNumber];
             else
-                roundsWon[map.name] += mapScore[teamNumber]
+                roundsWon[map.name] += mapScore[teamNumber];
 
             // rounds lost
             if (Object.keys(roundsLost).indexOf(map.name) === -1)
                 roundsLost[map.name] = mapScore[enemyTeamNumber];
             else
                 roundsLost[map.name] += mapScore[enemyTeamNumber];
+
+            // times played
+            played.push(map.name);
         }
     });
 
-    let tmpPlayed = data.matches.filter(m => m.status == 2).map(m => m.maps);
-    for (var maps of tmpPlayed) {
-        for (var map of maps) {
-            played.push(map.name);
-        }
-    }
+    // reduce times played early so we can calculate the average rounds won/lost
+    played = played.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+
+    // calculate average rounds won / lost
+    $.each(played, function (k, v) {
+        roundsWon[k] = parseFloat(roundsWon[k] / v).toFixed(1);
+        roundsLost[k] = parseFloat(roundsLost[k] / v).toFixed(1);
+    });
 
     // set data
     chartData.bans[cacheIndex] = bans.map(m => m.name).reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
     chartData.picks[cacheIndex] = picks.map(m => m.name).reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
     chartData.disregarded[cacheIndex] = disregarded.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
-    chartData.played[cacheIndex] = played.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
     chartData.mapsWon[cacheIndex] = mapsWon.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
     chartData.mapsLost[cacheIndex] = mapsLost.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+    chartData.played[cacheIndex] = played;
     chartData.roundsWon[cacheIndex] = roundsWon;
     chartData.roundsLost[cacheIndex] = roundsLost;
 }
@@ -229,6 +239,79 @@ function createMapChart(element, mapData) {
         options: {
             maintainAspectRatio: false,
         }
+    });
+}
+
+/**
+ * Updates the map charts
+ */
+function updateMapCharts() {
+    let currentMapPool = Object.values(_MapPool);
+    currentMapPool = currentMapPool[currentMapPool.length - 1];
+
+    $.each(charts, function (k, v) {
+        let mapData = Object.values(chartData[k][activeIndex] || {});
+        let mapLabels = Object.keys(chartData[k][activeIndex] || {});
+        for (let map of currentMapPool) {
+            if (mapLabels.indexOf(map) === -1)
+                mapLabels.push(map);
+        }
+
+        // update data & labels
+        v.data.labels = mapLabels;
+        v.data.datasets[0].data.splice(0); // empty data first, as this is a chartjs object
+        for (var md of mapData) {
+            v.data.datasets[0].data.push(md);
+        }
+
+        v.update();
+    });
+}
+
+/**
+ * Create the filter elements and initialize arrays
+ */
+function createFilters(cacheIndex) {
+    if (cacheIndex == -1)
+        cacheIndex = rawData.length - 1;
+
+    let $seasonFilter = $('#filter-seasons');
+    filter.seasons = [];
+
+    // set filter default options
+    $.each(rawData[cacheIndex].team.seasons, function (nSeason, division) {
+        let option = $('<option>').val(nSeason).text('Season ' + nSeason + ' (' + division.type + ')').prop('selected', true);
+        option.appendTo($seasonFilter);
+
+        filter.seasons.push(parseInt(nSeason));
+    });
+
+    // init bootstrap-select
+    $seasonFilter.selectpicker();
+
+    // seasons filter onChange
+    $seasonFilter.on('changed.bs.select', function () {
+        // update filter
+        filter.seasons = $(this).val().map(n => parseInt(n));
+        applyFilters();
+
+        // update visible data
+        interpretData(activeIndex);
+        updateMapCharts();
+    });
+}
+
+/**
+ * (Re-)Apply filters to the raw data
+ */
+function applyFilters() {
+    $.each(rawData, function (i, v) {
+        filteredData[i] = {
+            team: v.team,
+            matches: v.matches.filter(
+                m => filter.seasons.indexOf(m.season.number) !== -1
+            )
+        };
     });
 }
 
