@@ -25,10 +25,15 @@ namespace NinetyNineLibrary.Entities
             try
             {
                 var h2Name = node.SelectSingleNode("//div[@id='content']/div[2]/h2");
-                var h2NameSplit = h2Name.InnerText.Trim().Split(' ');
-                var h2NameSplitShortName = h2NameSplit.Last();
-                Name = string.Join(" ", h2NameSplit.Where(s => s != h2NameSplitShortName));
-                Shortname = h2NameSplitShortName.Trim(new char[] { '(', ')' });
+                if (h2Name == null)
+                    h2Name = node.SelectSingleNode("//div[@id='content']/div[1]/h2");
+
+                var nameRegEx = new Regex(AnalyzerConstants.TeamNamePattern);
+                var nameMatch = nameRegEx.Match(h2Name.InnerText.Trim());
+                Name = nameMatch.Groups[1].Value;
+                Shortname = nameMatch.Groups[2].Value;
+                //Name = string.Join(" ", h2NameSplit.Where(s => s != h2NameSplitShortName));
+                //Shortname = h2NameSplitShortName.Trim(new char[] { '(', ')' });
             }
             catch (Exception x)
             {

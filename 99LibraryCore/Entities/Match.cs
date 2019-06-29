@@ -79,6 +79,18 @@ namespace NinetyNineLibrary.Entities
             secondMapScores.Add(AnalyzerConstants.TeamSide.B, secondMapScoreB);
             Maps.Add(new Map(secondMapName, secondMapScores));
 
+            // if map score is not available anymore, but round scores are availabe
+            if (Score.All(s => s.Value == 0))
+            {
+                // Team A
+                Score[AnalyzerConstants.TeamSide.A] = firstMapScoreA > firstMapScoreB ? 1 : 0;
+                Score[AnalyzerConstants.TeamSide.A] += secondMapScoreA > secondMapScoreB ? 1 : 0;
+
+                // Team B
+                Score[AnalyzerConstants.TeamSide.B] = firstMapScoreB > firstMapScoreA ? 1 : 0;
+                Score[AnalyzerConstants.TeamSide.B] += secondMapScoreB > secondMapScoreA ? 1 : 0;
+            }
+
             // get vote data from match log
             var logNode = node.SelectSingleNode("//table[@id='match_log']");
             var trNodes = logNode.SelectNodes("tr");
